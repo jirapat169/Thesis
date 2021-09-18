@@ -1,0 +1,21 @@
+<nav mat-tab-nav-bar style="border: unset" class="bg-white box-shadow">
+  <a
+    mat-tab-link
+    [routerLink]="['/database/view']"
+    routerLinkActive="router-active"
+  >
+    {{ "ฐานข้อมูล" }}
+  </a>
+
+  <a
+    mat-tab-link
+    [routerLink]="['/database/query/']"
+    routerLinkActive="router-active"
+  >
+    {{ "Query" }}
+  </a>
+</nav>
+
+<div class="box-padding">
+  <router-outlet></router-outlet>
+</div>

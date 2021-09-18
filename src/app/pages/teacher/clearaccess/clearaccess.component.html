@@ -1,0 +1,66 @@
+<div class="box-padding">
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <h2>ลบสถานะการเข้าสู่ระบบ</h2>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="text-right">
+            <button
+              type="button"
+              class="btn btn-danger btn-sm"
+              (click)="deleteSelect()"
+            >
+              ลบที่เลือก
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <table
+        class="table table-sm table-borderless table-hover"
+        *ngIf="accessStudentRecord != null"
+      >
+        <thead>
+          <tr>
+            <th style="text-align: center; vertical-align: middle;"></th>
+            <th style="vertical-align: middle;">ชื่อ</th>
+            <th style="vertical-align: middle;">ที่อยู่ IP</th>
+            <th style="vertical-align: middle;">เวลาหมดอายุ</th>
+            <th style="vertical-align: middle;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let x of accessStudentRecord; let i = index">
+            <td style="text-align: center; vertical-align: middle;">
+              <input
+                type="checkbox"
+                aria-label="Checkbox Body"
+                id="check_{{ x.uid }}"
+              />
+            </td>
+            <td style="vertical-align: middle;">
+              {{ x.prename }}{{ x.firstNameThai }} {{ x.lastNameThai }}
+            </td>
+            <td style="vertical-align: middle;">
+              {{ x.ip_address }}
+            </td>
+            <td style="vertical-align: middle;">
+              {{ readTimeEnd(x.time_end) }}
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                (click)="deleteAccressStudent('\'' + x.uid + '\'')"
+              >
+                ลบ
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

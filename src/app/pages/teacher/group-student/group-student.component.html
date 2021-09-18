@@ -1,0 +1,412 @@
+<div class="box-padding">
+  <div class="row">
+    <div class="col-xl-6 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-7 mb-3">
+              <h2 class="">กลุ่มเรียนทั้งหมด</h2>
+            </div>
+            <div class="col-5 mb-3">
+              <div class="text-right">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  data-toggle="modal"
+                  data-target="#exampleModalEditGroup"
+                  (click)="onInsertGroup()"
+                >
+                  เพิ่มกลุ่มเรียน
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style="overflow: auto">
+            <table
+              class="table table-sm table-borderless table-hover"
+              *ngIf="groupStudent.length > 0"
+            >
+              <thead>
+                <tr class="text-center">
+                  <th></th>
+                  <th>ชื่อกลุ่ม</th>
+                  <th>รหัสผ่าน</th>
+                  <th>สถานะ</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let x of groupStudent; let i = index"
+                  [ngStyle]="{
+                    'background-color': x == groupSelectName ? '#fafafa' : '',
+                    'border-right':
+                      x == groupSelectName ? '3px solid #0b7bff' : ''
+                  }"
+                  class="text-center"
+                >
+                  <td
+                    style="
+                      vertical-align: middle;
+                      min-width: 30px;
+                      text-align: center;
+                    "
+                  >
+                    {{ i + 1 }}
+                  </td>
+                  <td style="vertical-align: middle; min-width: 120px">
+                    {{ x.name }}
+                  </td>
+                  <td style="vertical-align: middle; min-width: 90px">
+                    {{ x.password }}
+                  </td>
+                  <td
+                    style="
+                      vertical-align: middle;
+                      min-width: 50px;
+                      text-align: center;
+                    "
+                  >
+                    {{ x.status == "off" ? "ปิด" : "เปิด" }}
+                  </td>
+                  <td
+                    style="
+                      vertical-align: middle;
+                      min-width: 190px;
+                      text-align: center;
+                    "
+                  >
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-sm mr-2"
+                      (click)="getStudentingroup(x)"
+                    >
+                      รายชื่อ
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-warning btn-sm ml-2 mr-2"
+                      data-toggle="modal"
+                      data-target="#exampleModalEditGroup"
+                      (click)="onEditgroup(x)"
+                    >
+                      แก้ไข
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-sm ml-2"
+                      (click)="onDeleteGroup(x)"
+                    >
+                      ลบ
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="text-center" *ngIf="groupStudent.length <= 0">
+            <h3>ไม่พบกลุ่มเรียน</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="col-xl-6 mb-3"
+      *ngIf="groupSelectName != null && studentingroup != null"
+    >
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-9 mb-3">
+              <h2>รายชื่อนักศึกษา</h2>
+              <h4>กลุ่มเรียน&nbsp;{{ groupSelectName.name }}</h4>
+            </div>
+            <div class="col-3 mb-3">
+              <div class="text-right">
+                <button
+                  type="button"
+                  class="close"
+                  (click)="groupSelectName = null"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style="overflow: auto">
+            <table
+              class="table table-sm table-borderless table-hover"
+              *ngIf="studentingroup != null"
+            >
+              <thead>
+                <tr class="text-center">
+                  <th></th>
+                  <th>ชื่อ - นามสกุล</th>
+                  <th>รหัสนักศึกษา</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="
+                    let x of studentingroup
+                      | paginate
+                        : {
+                            id: 'pagiShowstudent',
+                            itemsPerPage: 10,
+                            currentPage: pagiShowstudent
+                          };
+                    let i = index
+                  "
+                  [ngStyle]="{
+                    'background-color': x == studentSelected ? '#fafafa' : '',
+                    'border-right':
+                      x == studentSelected ? '3px solid #0b7bff' : ''
+                  }"
+                  class="text-center"
+                >
+                  <td
+                    style="
+                      vertical-align: middle;
+                      min-width: 40px;
+                      text-align: center;
+                    "
+                  >
+                    {{ 10 * pagiShowstudent - 10 + i + 1 }}
+                  </td>
+                  <td
+                    style="
+                      vertical-align: middle;
+                      min-width: 200px;
+                      text-align: left;
+                    "
+                  >
+                    {{ x.prename }}{{ x.firstNameThai }} {{ x.lastNameThai }}
+                  </td>
+                  <td style="vertical-align: middle; min-width: 120px">
+                    {{ x.studentId }}
+                  </td>
+                  <td
+                    style="
+                      vertical-align: middle;
+                      min-width: 220px;
+                      text-align: center;
+                    "
+                  >
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-sm mr-2"
+                      (click)="onGetlogstudent(x)"
+                      data-toggle="modal"
+                      data-target="#exampleModalLogStudent"
+                    >
+                      ประวัติการเข้าใช้งาน
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-sm ml-2"
+                      (click)="onDeletestudent(x)"
+                    >
+                      ลบ
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="text-center">
+              <pagination-controls
+                id="pagiShowstudent"
+                *ngIf="studentingroup.length > 10"
+                responsive="true"
+                previousLabel="ย้อนกลับ"
+                nextLabel="ถัดไป"
+                (pageChange)="pagiShowstudent = $event"
+              ></pagination-controls>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="exampleModalEditGroup"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalEditGroupLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <form
+      [formGroup]="formInsertgroup"
+      (ngSubmit)="formInsertgroup.valid ? onInsartgroup() : ''"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="exampleModalEditGroupLabel">
+            ข้อมูลกลุ่มเรียน
+          </h2>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <mat-form-field>
+              <mat-label>ชื่อกลุ่มเรียน</mat-label>
+              <span matPrefix>CPE.&nbsp;</span>
+              <input
+                matInput
+                placeholder="ชื่อกลุ่มเรียน"
+                type="text"
+                required
+                formControlName="groupname"
+              />
+            </mat-form-field>
+          </div>
+
+          <div class="mb-3">
+            <mat-form-field>
+              <mat-label>รหัสกลุ่ม</mat-label>
+              <input
+                matInput
+                placeholder="รหัสกลุ่ม"
+                type="text"
+                required
+                formControlName="password"
+              />
+            </mat-form-field>
+          </div>
+
+          <div class="mb-3">
+            <mat-radio-group
+              aria-label="Select an option"
+              formControlName="status"
+            >
+              <mat-radio-button value="on">เปิด</mat-radio-button>
+              <mat-radio-button value="off" style="margin-left: 20px"
+                >ปิด</mat-radio-button
+              >
+            </mat-radio-group>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary btn-sm"
+            data-dismiss="modal"
+          >
+            ปิด
+          </button>
+          <button type="submit" class="btn btn-primary btn-sm">บันทึก</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Log Student -->
+<div
+  class="modal fade"
+  id="exampleModalLogStudent"
+  tabindex="-1"
+  aria-labelledby="exampleModalLogStudentLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="exampleModalLogStudentLabel">
+          <h2>ประวัติการเข้าใช้งาน</h2>
+          <h4 *ngIf="studentSelected">
+            {{ studentSelected.prename
+            }}{{ studentSelected.firstNameThai }}&nbsp;{{
+              studentSelected.lastNameThai
+            }}
+          </h4>
+        </div>
+
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="overflow: auto">
+          <table
+            class="table table-sm table-borderless table-hover"
+            *ngIf="logResult.length > 0"
+          >
+            <thead>
+              <tr class="text-center">
+                <th></th>
+                <th>เวลา</th>
+                <th>IP Address</th>
+                <th>สถานะ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let x of logResult; let i = index">
+                <td
+                  style="
+                    vertical-align: middle;
+                    min-width: 30px;
+                    text-align: center;
+                  "
+                >
+                  {{ i + 1 }}
+                </td>
+                <td
+                  style="
+                    vertical-align: middle;
+                    min-width: 180px;
+                    text-align: center;
+                  "
+                >
+                  {{ x.times }}
+                </td>
+                <td
+                  style="
+                    vertical-align: middle;
+                    min-width: 120px;
+                    text-align: center;
+                  "
+                >
+                  {{ x.ip_address }}
+                </td>
+                <td
+                  style="
+                    vertical-align: middle;
+                    min-width: 100px;
+                    text-align: center;
+                  "
+                >
+                  {{ x.status }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

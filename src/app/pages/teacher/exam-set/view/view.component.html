@@ -1,0 +1,608 @@
+<div class="row">
+  <div class="col-md-6 mb-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-7 mb-3">
+            <h2>ชุดข้อสอบทั้งหมด</h2>
+          </div>
+          <div class="col-5 mb-3">
+            <div class="text-right">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                (click)="
+                  onCheckInsert();
+                  checkUpdateTopic = false;
+                  examList = [];
+                  examView = []
+                "
+              >
+                สร้างชุดข้อสอบ
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style="overflow: auto">
+          <table class="table table-sm table-borderless table-hover">
+            <thead>
+              <tr class="text-center">
+                <th>รหัส</th>
+                <th>ชื่อชุดข้อสอบ</th>
+                <th>คำอธิบาย</th>
+                <th>คะแนนรวม</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="
+                  let x of filterExamBody()
+                    | paginate
+                      : {
+                          id: 'listExamSet',
+                          itemsPerPage: 10,
+                          currentPage: paginationPage
+                        };
+                  let i = index
+                "
+              >
+                <td
+                  style="
+                    vertical-align: middle;
+                    text-align: center;
+                    min-width: 60px;
+                  "
+                >
+                  <!-- {{ 10 * paginationPage - 10 + i + 1 }} -->
+                  {{ service.zeroPad(x.exambodyID, 1000) }}
+                </td>
+                <td style="vertical-align: middle">
+                  {{ x.topic }}
+                </td>
+                <td style="vertical-align: middle">
+                  {{ x.text }}
+                </td>
+                <td
+                  style="
+                    vertical-align: middle;
+                    text-align: center;
+                    min-width: 60px;
+                  "
+                >
+                  {{ x.exambodyScore }}
+                </td>
+                <td
+                  style="
+                    vertical-align: middle;
+                    text-align: center;
+                    min-width: 200px;
+                  "
+                >
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm mr-2"
+                    data-toggle="modal"
+                    data-target="#exampleModalShowExam"
+                    (click)="examView = x"
+                    [disabled]="x.exambodyScore <= 0"
+                  >
+                    ดูข้อสอบ
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn-warning btn-sm ml-2 mr-2"
+                    data-toggle="modal"
+                    data-target="#editExam"
+                    (click)="
+                      onUpdateTopic(x);
+                      checkTnsert = false;
+                      checkUpdateTopic = true;
+                      examView = x
+                    "
+                  >
+                    แก้ไข
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm ml-2"
+                    (click)="onDeletebody(x)"
+                  >
+                    ลบ
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="text-center">
+            <pagination-controls
+              id="listExamSet"
+              *ngIf="filterExamBody().length > 10"
+              responsive="true"
+              previousLabel="ย้อนกลับ"
+              nextLabel="ถัดไป"
+              (pageChange)="paginationPage = $event"
+            ></pagination-controls>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6" *ngIf="checkTnsert">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-7 mb-3">
+            <h2>สร้างชุดข้อสอบ</h2>
+          </div>
+          <div class="col-5 mb-3">
+            <div class="text-right">
+              <button
+                type="button"
+                class="close"
+                (click)="checkTnsert = false; examView = []"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <form [formGroup]="formTopic" (ngSubmit)="updateSubmit()">
+          <mat-form-field class="example-full-width">
+            <mat-label>ชื่อชุดข้อสอบ</mat-label>
+            <input
+              matInput
+              placeholder="ชื่อชุดข้อสอบ"
+              value=""
+              formControlName="topic"
+            />
+          </mat-form-field>
+          <mat-form-field class="example-full-width">
+            <mat-label>คำอธิบายชุดข้อสอบ</mat-label>
+            <input
+              matInput
+              placeholder="คำอธิบายชุดข้อสอบ"
+              value=""
+              formControlName="text"
+            />
+          </mat-form-field>
+          <mat-form-field class="example-full-width" *ngIf="checkRandom">
+            <mat-label>จำนวนข้อที่สุ่ม (จำนวนข้อสอบทั้งหมด : {{countExamStore}})</mat-label>
+            <input
+              matInput
+              placeholder="จำนวนข้อที่สุ่ม"
+              type="number"
+              formControlName="isRandom"
+            />
+          </mat-form-field>
+
+          <div class="mb-3">
+            สุ่มข้อสอบ:&nbsp;&nbsp;
+            <mat-slide-toggle
+              [checked]="checkRandom"
+              (toggleChange)="onCheckRandom(checkRandom)"
+            ></mat-slide-toggle>
+            &nbsp;&nbsp;<span class="text-danger"
+              >** สุ่มข้อสอบทั้งหมดจากคลังข้อสอบ</span
+            >
+          </div>
+
+          <div>
+            <button
+              [disabled]="checkRandom"
+              type="button"
+              class="btn btn-primary btn-sm"
+              data-toggle="modal"
+              data-target="#exampleModalSelectExam"
+            >
+              เลือกข้อสอบ
+            </button>
+          </div>
+
+          <div
+            class="mb-3 mt-3"
+            *ngIf="examList.length > 0"
+            style="overflow: auto"
+          >
+            <table class="table table-sm table-borderless table-hover">
+              <thead>
+                <tr class="text-center">
+                  <th></th>
+                  <th>โจทย์</th>
+                  <th>คะแนน</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let xx of examList; let j = index">
+                  <td
+                    style="
+                      vertical-align: middle;
+                      min-width: 40px;
+                      text-align: center;
+                    "
+                  >
+                    {{ j + 1 }}
+                  </td>
+                  <td style="vertical-align: middle">
+                    {{ replaceText(xx.text) }}
+                  </td>
+                  <td
+                    style="
+                      vertical-align: middle;
+                      min-width: 50px;
+                      text-align: center;
+                    "
+                  >
+                    {{ xx.score }}
+                  </td>
+                  <td style="vertical-align: middle">
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="popExam(xx)"
+                    >
+                      ลบ
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-3 text-right">
+            <button type="submit" class="btn btn-primary btn-sm">บันทึก</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6" *ngIf="checkUpdateTopic">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-7 mb-3">
+            <h2>แก้ไขชุดข้อสอบ</h2>
+            <h4>
+              รหัสชุดข้อสอบ :
+              {{ service.zeroPad(formUpdateTopic.value.exambodyID, 1000) }}
+            </h4>
+          </div>
+          <div class="col-5 mb-3">
+            <div class="text-right">
+              <button
+                type="button"
+                class="close"
+                (click)="checkUpdateTopic = false; examView = []"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <form [formGroup]="formUpdateTopic" (ngSubmit)="updateSubmit()">
+          <mat-form-field class="example-full-width">
+            <mat-label>ชื่อชุดข้อสอบ</mat-label>
+            <input
+              matInput
+              placeholder="ชื่อชุดข้อสอบ"
+              value=""
+              formControlName="topic"
+            />
+          </mat-form-field>
+          <mat-form-field class="example-full-width">
+            <mat-label>คำอธิบายชุดข้อสอบ</mat-label>
+            <input
+              matInput
+              placeholder="คำอธิบายชุดข้อสอบ"
+              value=""
+              formControlName="text"
+            />
+          </mat-form-field>
+          <mat-form-field class="example-full-width" *ngIf="checkRandom">
+            <mat-label>จำนวนข้อที่สุ่ม (จำนวนข้อสอบทั้งหมด : {{countExamStore}})</mat-label>
+            <input
+              matInput
+              placeholder="จำนวนข้อที่สุ่ม"
+              value=""
+              type="number"
+              formControlName="isRandom"
+            />
+          </mat-form-field>
+
+          <div class="mb-3">
+            สุ่มข้อสอบ:&nbsp;&nbsp;
+            <mat-slide-toggle
+              [checked]="checkRandom"
+              (toggleChange)="onCheckRandom(checkRandom)"
+            ></mat-slide-toggle>
+            &nbsp;&nbsp;<span class="text-danger"
+              >** สุ่มข้อสอบทั้งหมดจากคลังข้อสอบ</span
+            >
+          </div>
+
+          <div>
+            <button
+              [disabled]="checkRandom"
+              type="button"
+              class="btn btn-primary btn-sm"
+              data-toggle="modal"
+              data-target="#exampleModalSelectExam"
+            >
+              เลือกข้อสอบ
+            </button>
+          </div>
+
+          <div
+            class="mb-3 mt-3"
+            *ngIf="examList.length > 0"
+            style="overflow: auto"
+          >
+            <table class="table table-sm table-borderless table-hover">
+              <thead>
+                <tr class="text-center">
+                  <th></th>
+                  <th>โจทย์</th>
+                  <th>คะแนน</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let xx of examList; let j = index">
+                  <td
+                    style="
+                      vertical-align: middle;
+                      min-width: 40px;
+                      text-align: center;
+                    "
+                  >
+                    {{ j + 1 }}
+                  </td>
+                  <td style="vertical-align: middle">
+                    {{ replaceText(xx.text) }}
+                  </td>
+                  <td
+                    style="
+                      vertical-align: middle;
+                      min-width: 50px;
+                      text-align: center;
+                    "
+                  >
+                    {{ xx.score }}
+                  </td>
+                  <td style="vertical-align: middle">
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="popExam(xx)"
+                    >
+                      ลบ
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-3 text-right">
+            <button type="submit" class="btn btn-primary btn-sm">บันทึก</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="exampleModalShowExam"
+  tabindex="-1"
+  aria-labelledby="exampleModalShowExamLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="exampleModalShowExamLabel">
+          <h2>รายละเอียดข้อสอบ</h2>
+          <h4>รหัส : {{ service.zeroPad(examView["exambodyID"], 1000) }}</h4>
+        </div>
+
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="overflow: auto">
+          <table class="table table-sm table-borderless table-hover">
+            <thead>
+              <tr>
+                <th></th>
+                <th>โจทย์</th>
+                <th style="text-align: center">คะแนน</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let xx of examView['exambodyData']; let j = index">
+                <td
+                  style="
+                    vertical-align: middle;
+                    min-width: 40px;
+                    text-align: center;
+                  "
+                >
+                  {{ j + 1 }}
+                </td>
+                <td style="vertical-align: middle">
+                  {{ replaceText(xx.text) }}
+                </td>
+                <td
+                  style="
+                    vertical-align: middle;
+                    min-width: 50px;
+                    text-align: center;
+                  "
+                >
+                  {{ xx.score }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="exampleModalSelectExam"
+  tabindex="-1"
+  aria-labelledby="exampleModalSelectExamLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="exampleModalSelectExamLabel">
+          เลือกข้อสอบ
+        </h2>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="listUnit.length > 0">
+          <div class="accordion" id="listUnit">
+            <div class="card mb-2" *ngFor="let x of listUnit; let i = index">
+              <div
+                class="card-header"
+                id="headingOne{{ i }}"
+                style="padding: unset"
+              >
+                <h2 class="mb-0">
+                  <button
+                    class="btn btn-link btn-block text-left"
+                    type="button"
+                    data-toggle="collapse"
+                    [attr.data-target]="'#collapseOne' + i"
+                    aria-expanded="true"
+                    [attr.aria-controls]="'collapseOne' + i"
+                    (click)="getExamByUnit(x.examUnitID)"
+                  >
+                    หน่วยการเรียนรู้ : {{ x.name }}
+                  </button>
+                </h2>
+              </div>
+
+              <div
+                id="collapseOne{{ i }}"
+                class="collapse"
+                [attr.aria-labelledby]="'headingOne' + i"
+                data-parent="#listUnit"
+              >
+                <div class="card-body">
+                  <div *ngIf="purposeList.length > 0; else nonePurpose">
+                    <div *ngFor="let x of purposeList; let i = index">
+                      <div class="mb-3">
+                        <h4><b>จุดประสงค์ : </b>{{ x.name }}</h4>
+                      </div>
+                      <div
+                        class="mb-3 ml-2"
+                        *ngIf="examFilter(x.examdata).length > 0; else noneExam"
+                        style="overflow: auto"
+                      >
+                        <table
+                          class="table table-sm table-borderless table-hover"
+                        >
+                          <thead>
+                            <tr class="text-center">
+                              <th></th>
+                              <th style="text-align: left">โจทย์</th>
+                              <th>คะแนน</th>
+                              <th></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              *ngFor="
+                                let xx of examFilter(x.examdata);
+                                let j = index
+                              "
+                            >
+                              <td
+                                style="
+                                  vertical-align: middle;
+                                  min-width: 40px;
+                                  text-align: center;
+                                "
+                              >
+                                {{ j + 1 }}
+                              </td>
+                              <td
+                                style="vertical-align: middle; min-width: 150px"
+                              >
+                                {{ replaceText(xx.text) }}
+                              </td>
+                              <td
+                                style="
+                                  vertical-align: middle;
+                                  min-width: 50px;
+                                  text-align: center;
+                                "
+                              >
+                                {{ xx.score }}
+                              </td>
+                              <td
+                                style="vertical-align: middle; min-width: 50px"
+                              >
+                                <button
+                                  type="button"
+                                  class="btn btn-primary btn-sm"
+                                  (click)="pushExam(xx)"
+                                >
+                                  เพิ่ม
+                                </button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <ng-template #noneExam>
+                        <div class="ml-3 mb-3">ไม่มีข้อสอบ</div>
+                      </ng-template>
+                    </div>
+                  </div>
+
+                  <ng-template #nonePurpose>
+                    <div class="ml-3">ไม่มีจุดประสงค์ และข้อสอบ</div>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
