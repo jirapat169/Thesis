@@ -5,9 +5,9 @@
 export const environment = {
   production: false,
   ssoLogin:
-    'http://cpe.rmuti.ac.th/project/QR_Student/sso/?sso&redirect=http://localhost:4200/login?sso=true',
+    'https://www.cpe.rmuti.ac.th/project/QR_Student/sso/?sso&redirect=http://localhost:4200/login?sso=true',
   ssoLogout:
-    'http://cpe.rmuti.ac.th/project/QR_Student/sso/?slo&redirect=http://localhost:4200/login',
+    'https://www.cpe.rmuti.ac.th/project/QR_Student/sso/?slo&redirect=http://localhost:4200/login',
   baseHref: '/',
   url: 'http://localhost:4200/',
   rootAPI: 'http://www.cpe.rmuti.ac.th/project/sqlchecking/api/index.php/',
