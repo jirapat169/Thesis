@@ -5,6 +5,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { DefaultComponent } from './components/default/default.component';
 import { PrivateComponent } from './components/private/private.component';
 import { CheckLoginGuard } from './guards/check-login.guard';
+import { RegisterComponent } from './pages/register/register.component';
 
 const routes: Routes = [
   {
@@ -15,6 +16,10 @@ const routes: Routes = [
         path: 'login',
         loadChildren: () =>
           import('./pages/login/login.module').then((m) => m.LoginModule),
+      },
+      {
+        path: 'register',
+        component: RegisterComponent,
       },
       {
         path: 'notfound',
@@ -121,7 +126,6 @@ const routes: Routes = [
                 (m) => m.HistoryTestModule
               ),
           },
-
         ],
       },
       {

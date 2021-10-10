@@ -28,11 +28,12 @@ import { registerLocaleData } from '@angular/common';
 
 import 'froala-editor/js/plugins.pkgd.min.js';
 import 'froala-editor/js/third_party/font_awesome.min';
+import { RegisterComponent } from './pages/register/register.component';
 
 registerLocaleData(localeTh);
 
 @NgModule({
-  declarations: [AppComponent, DefaultComponent, PrivateComponent],
+  declarations: [AppComponent, DefaultComponent, PrivateComponent, RegisterComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
